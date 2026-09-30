@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { randomBytes } from 'node:crypto'
 import bcrypt from 'bcryptjs'
+import rateLimit from 'express-rate-limit'
 import { z } from 'zod'
 import { prisma } from '../lib/prisma.js'
 import { authenticate, hashSessionToken, sessionCookieName } from '../middleware/auth.js'
@@ -8,6 +9,15 @@ import { HttpError } from '../middleware/errors.js'
 import { validate } from '../middleware/validate.js'
 
 export const authRouter = Router()
+const dummyPasswordHash = bcrypt.hashSync(randomBytes(32).toString('hex'), 12)
+
+authRouter.use(['/register', '/login'], rateLimit({
+  windowMs: 15 * 60_000,
+  limit: 10,
+  standardHeaders: 'draft-8',
+  legacyHeaders: false,
+  message: { error: 'Too many sign-in attempts. Try again later.', code: 'AUTH_RATE_LIMITED' },
+}))
 
 const credentialsSchema = z.object({
   email: z.string().trim().email().max(254).transform((value) => value.toLowerCase()),
@@ -27,7 +37,7 @@ function cookieOptions() {
   return {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production' || process.env.COOKIE_SECURE === 'true',
-    sameSite: 'lax',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     path: '/',
     maxAge: Number(process.env.SESSION_TTL_DAYS ?? 7) * 24 * 60 * 60 * 1000,
   }
@@ -36,6 +46,7 @@ function cookieOptions() {
 async function startSession(user, response) {
   const token = randomBytes(32).toString('base64url')
   const expiresAt = new Date(Date.now() + cookieOptions().maxAge)
+  await prisma.session.deleteMany({ where: { expiresAt: { lt: new Date() } } })
   await prisma.session.create({
     data: { userId: user.id, tokenHash: hashSessionToken(token), expiresAt },
   })
@@ -64,7 +75,8 @@ authRouter.post('/register', validate(registrationSchema), async (request, respo
 
 authRouter.post('/login', validate(credentialsSchema), async (request, response) => {
   const user = await prisma.user.findUnique({ where: { email: request.body.email } })
-  const valid = user && await bcrypt.compare(request.body.password, user.passwordHash)
+  const validPassword = await bcrypt.compare(request.body.password, user?.passwordHash ?? dummyPasswordHash)
+  const valid = Boolean(user) && validPassword
   if (!valid) throw new HttpError(401, 'Email or password is incorrect', 'INVALID_CREDENTIALS')
 
   await startSession(user, response)

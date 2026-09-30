@@ -52,11 +52,13 @@ Admin routes are guarded by both the session and the `ADMIN` role. Staff can cre
 
 Passwords are hashed with bcryptjs (cost 12). A successful registration or login creates a cryptographically random opaque session token in an HttpOnly, SameSite=Lax cookie. Only its SHA-256 hash and expiry are stored in PostgreSQL. `authenticate` resolves that record on protected requests; `requireRole('ADMIN')` enforces staff access on the server. Logout deletes the active session and clears the cookie. Production cookies are Secure and CORS accepts only the configured client origin.
 
+When the storefront and API are deployed on separate sites, production cookies use `SameSite=None; Secure`; state-changing API calls must carry the exact configured `Origin`. Authentication routes have a tighter rate limit, and account/cart/order/admin responses are marked `no-store`.
+
 ## Local setup
 
 Requirements: Node.js 20.19+ and PostgreSQL 15+.
 
-1. Copy `.env.example` to `.env` and set a unique `SESSION_SECRET`, database URL, and demo admin credentials.
+1. Copy `.env.example` to `.env` and set the database URL and demo admin credentials. Production must also set the exact frontend origin and serve the API over HTTPS for cross-site session cookies.
 2. Install dependencies with `npm install`.
 3. Start the API and storefront with `npm run dev`.
 4. Apply migrations and seed data with the Prisma commands documented as database phases are added.

@@ -24,6 +24,6 @@ export function errorHandler(error, _request, response, _next) {
       details: error.issues.map(({ path, message }) => ({ path: path.join('.'), message })),
     })
   }
-  console.error(error)
+  console.error(error?.name ?? 'Error', error?.code ?? 'UNEXPECTED_ERROR')
   return response.status(500).json({ error: 'Something went wrong', code: 'INTERNAL_ERROR' })
 }

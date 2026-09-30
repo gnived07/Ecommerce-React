@@ -4,12 +4,13 @@ import cors from 'cors'
 import cookieParser from 'cookie-parser'
 import rateLimit from 'express-rate-limit'
 import { prisma } from './lib/prisma.js'
-import { errorHandler, notFoundHandler } from './middleware/errors.js'
+import { errorHandler, HttpError, notFoundHandler } from './middleware/errors.js'
 import { authRouter } from './routes/auth.js'
 import { catalogRouter } from './routes/catalog.js'
 import { cartRouter } from './routes/cart.js'
 import { orderRouter } from './routes/orders.js'
 import { adminRouter } from './routes/admin.js'
+import { noStore, verifyRequestOrigin } from './middleware/security.js'
 
 export const app = express()
 
@@ -23,13 +24,15 @@ const allowedOrigins = new Set(
 app.use(cors({
   origin(origin, callback) {
     if (!origin || allowedOrigins.has(origin)) return callback(null, true)
-    return callback(new Error('Origin is not allowed by CORS'))
+    return callback(new HttpError(403, 'This request origin is not allowed', 'ORIGIN_NOT_ALLOWED'))
   },
   credentials: true,
 }))
 app.use(express.json({ limit: '32kb' }))
 app.use(cookieParser())
 app.use(rateLimit({ windowMs: 60_000, limit: 120, standardHeaders: 'draft-8', legacyHeaders: false }))
+app.use(verifyRequestOrigin)
+app.use(['/api/auth', '/api/cart', '/api/orders', '/api/admin'], noStore)
 
 app.use('/api/auth', authRouter)
 app.use('/api', catalogRouter)

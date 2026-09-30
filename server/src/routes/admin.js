@@ -8,7 +8,10 @@ import { validate } from '../middleware/validate.js'
 export const adminRouter = Router()
 adminRouter.use(authenticate, requireRole('ADMIN'))
 
-const imageSchema = z.object({ url: z.string().url().max(1000), alt: z.string().trim().min(1).max(180) })
+const imageSchema = z.object({
+  url: z.string().url().max(1000).refine((value) => new URL(value).protocol === 'https:', 'Use a secure HTTPS image URL'),
+  alt: z.string().trim().min(1).max(180),
+})
 const variantSchema = z.object({
   sku: z.string().trim().min(2).max(80),
   size: z.string().trim().min(1).max(30),
