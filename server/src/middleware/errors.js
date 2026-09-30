@@ -11,6 +11,9 @@ export function notFoundHandler(_request, _response, next) {
 }
 
 export function errorHandler(error, _request, response, _next) {
+  if (error?.code === 'P2034') {
+    return response.status(409).json({ error: 'This changed at the same time as another request. Please try again.', code: 'CONCURRENT_UPDATE' })
+  }
   if (error instanceof HttpError) {
     return response.status(error.status).json({ error: error.message, code: error.code })
   }

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { Menu, Search, ShoppingBag, UserRound, X } from 'lucide-react'
+import { useCart } from '../context/CartContext.jsx'
 
 const links = [
   ['New arrivals', '/shop?sort=newest'],
@@ -11,6 +12,7 @@ const links = [
 
 export default function SiteHeader() {
   const [open, setOpen] = useState(false)
+  const { cart, setDrawerOpen } = useCart()
   return (
     <>
       <div className="announcement">Complimentary delivery on orders over ₹5,000</div>
@@ -26,7 +28,7 @@ export default function SiteHeader() {
           <div className="site-header__actions">
             <Link className="icon-button" to="/shop?focus=search" aria-label="Search"><Search size={18} strokeWidth={1.4} /></Link>
             <Link className="icon-button site-header__account" to="/login" aria-label="Account"><UserRound size={18} strokeWidth={1.4} /></Link>
-            <Link className="icon-button bag-link" to="/bag" aria-label="Shopping bag"><ShoppingBag size={18} strokeWidth={1.4} /></Link>
+            <button className="icon-button bag-link" type="button" onClick={() => setDrawerOpen(true)} aria-label={`Shopping bag, ${cart?.itemCount ?? 0} items`}><ShoppingBag size={18} strokeWidth={1.4} />{cart?.itemCount > 0 && <span className="bag-link__count">{cart.itemCount}</span>}</button>
           </div>
         </div>
         {open && <nav className="mobile-menu page-width" aria-label="Mobile navigation">{links.map(([label, to]) => <Link onClick={() => setOpen(false)} key={label} to={to}>{label}</Link>)}<a href="/#about" onClick={() => setOpen(false)}>About FitCheck</a></nav>}

@@ -5,9 +5,11 @@ import { formatCurrency } from '../lib/format.js'
 import ProductCard from '../components/catalog/ProductCard.jsx'
 import ProductGridSkeleton from '../components/catalog/ProductGridSkeleton.jsx'
 import Button from '../components/ui/Button.jsx'
+import { useCart } from '../context/CartContext.jsx'
 
 export default function ProductPage() {
   const { slug } = useParams()
+  const { addItem, busy: cartBusy } = useCart()
   const [product, setProduct] = useState(null)
   const [related, setRelated] = useState([])
   const [loading, setLoading] = useState(true)
@@ -44,6 +46,7 @@ export default function ProductPage() {
   const colors = useMemo(() => [...new Set(product?.variants.map((variant) => variant.color) ?? [])], [product])
   const selectedVariant = product?.variants.find((variant) => variant.size === size && variant.color === color)
   const availableImages = product?.images ?? []
+  const [cartMessage, setCartMessage] = useState('')
 
   function selectColor(nextColor) {
     setColor(nextColor)
@@ -59,6 +62,16 @@ export default function ProductPage() {
       ?? product.variants.find((variant) => variant.size === nextSize && variant.stock > 0)
     if (match) setColor(match.color)
     setQuantity(1)
+  }
+
+  async function addToBag() {
+    if (!selectedVariant) return
+    setCartMessage('')
+    try {
+      await addItem(selectedVariant.id, quantity)
+    } catch (requestError) {
+      setCartMessage(requestError.status === 401 ? 'AUTH_REQUIRED' : requestError.message)
+    }
   }
 
   if (loading) return <div className="product-loading page-width" aria-busy="true"><div className="skeleton product-loading__image" /><div><div className="skeleton" style={{ width: '40%', height: 12 }} /><div className="skeleton" style={{ width: '80%', height: 42, marginTop: 20 }} /><div className="skeleton" style={{ width: '30%', height: 18, marginTop: 18 }} /></div></div>
@@ -89,8 +102,8 @@ export default function ProductPage() {
             return <button type="button" key={option} disabled={!available} aria-pressed={size === option} className={size === option ? 'is-selected' : ''} onClick={() => chooseSize(option)}>{option}</button>
           })}</div></fieldset>}
 
-          <div className="product-purchase"><label className="quantity-control"><span className="sr-only">Quantity</span><button type="button" aria-label="Decrease quantity" disabled={quantity <= 1} onClick={() => setQuantity((value) => Math.max(1, value - 1))}>−</button><span aria-live="polite">{quantity}</span><button type="button" aria-label="Increase quantity" disabled={!selectedVariant || quantity >= selectedVariant.stock} onClick={() => setQuantity((value) => Math.min(selectedVariant?.stock ?? 1, value + 1))}>+</button></label><Button disabled title="Shopping bag is being connected">Add to bag</Button></div>
-          <p className="body-copy product-info__bag-note" aria-live="polite">{selectedVariant ? `${selectedVariant.stock} available in ${selectedVariant.size} / ${selectedVariant.color}` : 'Choose an available size and colour.'}</p>
+          <div className="product-purchase"><label className="quantity-control"><span className="sr-only">Quantity</span><button type="button" aria-label="Decrease quantity" disabled={quantity <= 1} onClick={() => setQuantity((value) => Math.max(1, value - 1))}>−</button><span aria-live="polite">{quantity}</span><button type="button" aria-label="Increase quantity" disabled={!selectedVariant || quantity >= selectedVariant.stock} onClick={() => setQuantity((value) => Math.min(selectedVariant?.stock ?? 1, value + 1))}>+</button></label><Button disabled={!selectedVariant || selectedVariant.stock < 1 || cartBusy} onClick={addToBag}>{cartBusy ? 'Adding…' : 'Add to bag'}</Button></div>
+          <p className="body-copy product-info__bag-note" aria-live="polite">{cartMessage === 'AUTH_REQUIRED' ? <><Link to="/login">Sign in</Link> to save your bag.</> : cartMessage || (selectedVariant ? `${selectedVariant.stock} available in ${selectedVariant.size} / ${selectedVariant.color}` : 'Choose an available size and colour.')}</p>
 
           <div className="product-accordions">
             <details open><summary>About this piece</summary><p>{product.details || product.description}</p></details>

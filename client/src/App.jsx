@@ -6,6 +6,8 @@ import CatalogPage from './pages/CatalogPage.jsx'
 import ProductPage from './pages/ProductPage.jsx'
 import Button from './components/ui/Button.jsx'
 import { Link } from 'react-router-dom'
+import { CartProvider } from './context/CartContext.jsx'
+import LoginPage from './pages/LoginPage.jsx'
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -19,19 +21,20 @@ function ComingSoonPage({ title, message }) {
 
 export default function App() {
   return (
-    <>
+    <CartProvider>
       <ScrollToTop />
       <Routes>
         <Route element={<SiteLayout />}>
           <Route index element={<HomePage />} />
           <Route path="shop" element={<CatalogPage />} />
           <Route path="products/:slug" element={<ProductPage />} />
-          <Route path="bag" element={<ComingSoonPage title="Your bag is waiting." message="Your shopping bag will live here. Browse the collection to find something worth keeping." />} />
-          <Route path="login" element={<ComingSoonPage title="A place for your pieces." message="Account sign-in is coming soon. Your FitCheck account will keep your orders and details together." />} />
+          <Route path="login" element={<LoginPage />} />
+          <Route path="register" element={<LoginPage mode="register" />} />
+          <Route path="checkout" element={<ComingSoonPage title="A thoughtful checkout." message="Checkout and order placement are being connected. Your bag will remain saved while we finish this step." />} />
           <Route path="account" element={<ComingSoonPage title="Your FitCheck account." message="Order history and account details are coming soon." />} />
           <Route path="*" element={<ComingSoonPage title="That page has moved." message="Let's find your way back to the collection." />} />
         </Route>
       </Routes>
-    </>
+    </CartProvider>
   )
 }

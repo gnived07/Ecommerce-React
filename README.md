@@ -43,6 +43,8 @@ Customer-facing prices are stored as integer minor units and formatted as Indian
 
 Exact request and response shapes will be documented alongside their implementation.
 
+Cart routes require an authenticated session. Each cart line points to a product variant; the API derives item prices and subtotals from current database values and checks stock before changing quantities. The browser cart is a view of that persisted record, never the source of pricing or inventory data.
+
 ## Authentication model
 
 Passwords are hashed with bcryptjs (cost 12). A successful registration or login creates a cryptographically random opaque session token in an HttpOnly, SameSite=Lax cookie. Only its SHA-256 hash and expiry are stored in PostgreSQL. `authenticate` resolves that record on protected requests; `requireRole('ADMIN')` enforces staff access on the server. Logout deletes the active session and clears the cookie. Production cookies are Secure and CORS accepts only the configured client origin.
