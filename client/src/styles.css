@@ -359,6 +359,7 @@ img { display: block; max-width: 100%; }
 .admin-order__bottom label { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 9px; }
 .admin-order__bottom select { max-width: 145px; min-height: 32px; border: 1px solid var(--line); background: transparent; color: var(--ink); font-size: 10px; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; clip-path: inset(50%); }
+.route-loading { min-height: 52vh; display: grid; place-items: center; color: var(--muted); font-family: var(--serif); font-size: 22px; }
 
 @media (max-width: 850px) {
   .site-header__inner { min-height: 66px; }

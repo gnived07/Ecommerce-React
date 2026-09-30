@@ -18,11 +18,12 @@ export default function SiteHeader() {
       <div className="announcement">Complimentary delivery on orders over ₹5,000</div>
       <header className="site-header">
         <div className="site-header__inner page-width">
-          <button className="icon-button site-header__menu" type="button" aria-label={open ? 'Close menu' : 'Open menu'} onClick={() => setOpen((value) => !value)}>
+          <button className="icon-button site-header__menu" type="button" aria-label={open ? 'Close menu' : 'Open menu'} aria-expanded={open} aria-controls="mobile-navigation" onClick={() => setOpen((value) => !value)}>
             {open ? <X size={19} strokeWidth={1.4} /> : <Menu size={19} strokeWidth={1.4} />}
           </button>
           <nav className="site-header__nav" aria-label="Main navigation">
             {links.map(([label, to]) => <NavLink key={label} to={to}>{label}</NavLink>)}
+            <a href="/#about">About</a>
           </nav>
           <Link className="brand" to="/" aria-label="FitCheck home">FitCheck<span>®</span></Link>
           <div className="site-header__actions">
@@ -31,7 +32,7 @@ export default function SiteHeader() {
             <button className="icon-button bag-link" type="button" onClick={() => setDrawerOpen(true)} aria-label={`Shopping bag, ${cart?.itemCount ?? 0} items`}><ShoppingBag size={18} strokeWidth={1.4} />{cart?.itemCount > 0 && <span className="bag-link__count">{cart.itemCount}</span>}</button>
           </div>
         </div>
-        {open && <nav className="mobile-menu page-width" aria-label="Mobile navigation">{links.map(([label, to]) => <Link onClick={() => setOpen(false)} key={label} to={to}>{label}</Link>)}<a href="/#about" onClick={() => setOpen(false)}>About FitCheck</a></nav>}
+        {open && <nav id="mobile-navigation" className="mobile-menu page-width" aria-label="Mobile navigation">{links.map(([label, to]) => <Link onClick={() => setOpen(false)} key={label} to={to}>{label}</Link>)}<a href="/#about" onClick={() => setOpen(false)}>About FitCheck</a></nav>}
       </header>
     </>
   )

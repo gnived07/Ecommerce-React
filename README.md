@@ -67,6 +67,8 @@ The API health endpoint is `http://localhost:4000/api/health`; Vite runs at `htt
 
 Run the dependency-free storefront formatting tests with `npm test`. The API integration workflow also runs when `TEST_DATABASE_URL` points to a disposable PostgreSQL database with the current Prisma schema applied; it exercises registration, role denial, catalog, cart, checkout, inventory updates, order access, and admin cancellation/restock.
 
+The catalog uses database-level pagination for newest/name order and a parameterized PostgreSQL query for price order, so it does not load the full catalog into browser memory. Catalog and category-card imagery loads lazily; route pages are code-split. Mobile navigation, product selection, checkout, bag, and admin controls adapt to narrow screens and expose keyboard focus, labels, empty/error/loading states, and reduced-motion behavior.
+
 ## Deployment
 
 The Vite client can deploy to Vercel, the Express server to Render or Railway, and PostgreSQL to Neon or Supabase. Configure the client URL, API URL, database URL, and session secret in the deployment environment; production cookies must use HTTPS and the frontend origin must be explicitly allowed by CORS.

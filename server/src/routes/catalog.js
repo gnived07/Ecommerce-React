@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import { z } from 'zod'
+import { Prisma } from '@prisma/client'
 import { prisma } from '../lib/prisma.js'
 import { HttpError } from '../middleware/errors.js'
 import { validate } from '../middleware/validate.js'
@@ -84,16 +85,50 @@ catalogRouter.get('/products', validate(listSchema, 'query'), async (request, re
     ...(size || inStock || minPriceCents !== undefined || maxPriceCents !== undefined
       ? { variants: { some: variantFilter } } : {}),
   }
-  const [total, rows] = await prisma.$transaction([
-    prisma.product.count({ where }),
-    prisma.product.findMany({ where, select: publicProductSelect, orderBy: { createdAt: 'desc' } }),
-  ])
-  let products = rows.map(presentProduct)
-  if (sort === 'price-asc') products.sort((a, b) => (a.priceCents ?? Infinity) - (b.priceCents ?? Infinity))
-  if (sort === 'price-desc') products.sort((a, b) => (b.priceCents ?? -Infinity) - (a.priceCents ?? -Infinity))
-  if (sort === 'name') products.sort((a, b) => a.name.localeCompare(b.name))
   const start = (page - 1) * limit
-  response.json({ products: products.slice(start, start + limit), pagination: { page, limit, total, pages: Math.ceil(total / limit) } })
+  const total = await prisma.product.count({ where })
+  let rows
+
+  if (sort === 'price-asc' || sort === 'price-desc') {
+    const variantConditions = [Prisma.sql`v."active" = TRUE`]
+    if (size) variantConditions.push(Prisma.sql`LOWER(v."size") = LOWER(${size})`)
+    if (inStock === 'true') variantConditions.push(Prisma.sql`v."stock" > 0`)
+    if (inStock === 'false') variantConditions.push(Prisma.sql`v."stock" = 0`)
+    if (minPriceCents !== undefined) variantConditions.push(Prisma.sql`v."priceCents" >= ${minPriceCents}`)
+    if (maxPriceCents !== undefined) variantConditions.push(Prisma.sql`v."priceCents" <= ${maxPriceCents}`)
+    const productConditions = [Prisma.sql`p."published" = TRUE`]
+    if (featured === 'true') productConditions.push(Prisma.sql`p."featured" = TRUE`)
+    if (category) productConditions.push(Prisma.sql`c."slug" = ${category}`)
+    if (q) {
+      const term = `%${q}%`
+      productConditions.push(Prisma.sql`(p."name" ILIKE ${term} OR p."description" ILIKE ${term} OR c."name" ILIKE ${term})`)
+    }
+    if (variantConditions.length > 1) productConditions.push(Prisma.sql`v."id" IS NOT NULL`)
+    const direction = sort === 'price-asc' ? Prisma.sql`ASC` : Prisma.sql`DESC`
+    const ordered = await prisma.$queryRaw(Prisma.sql`
+      SELECT p."id"
+      FROM "Product" AS p
+      JOIN "Category" AS c ON c."id" = p."categoryId"
+      LEFT JOIN "ProductVariant" AS v ON v."productId" = p."id" AND ${Prisma.join(variantConditions, ' AND ')}
+      WHERE ${Prisma.join(productConditions, ' AND ')}
+      GROUP BY p."id"
+      ORDER BY MIN(v."priceCents") ${direction} NULLS LAST, p."createdAt" DESC
+      LIMIT ${limit} OFFSET ${start}
+    `)
+    const ids = ordered.map(({ id }) => id)
+    const fetched = ids.length ? await prisma.product.findMany({ where: { id: { in: ids } }, select: publicProductSelect }) : []
+    const byId = new Map(fetched.map((product) => [product.id, product]))
+    rows = ids.map((id) => byId.get(id)).filter(Boolean)
+  } else {
+    rows = await prisma.product.findMany({
+      where,
+      select: publicProductSelect,
+      orderBy: sort === 'name' ? { name: 'asc' } : { createdAt: 'desc' },
+      skip: start,
+      take: limit,
+    })
+  }
+  response.json({ products: rows.map(presentProduct), pagination: { page, limit, total, pages: Math.ceil(total / limit) } })
 })
 
 catalogRouter.get('/products/:slug', async (request, response) => {

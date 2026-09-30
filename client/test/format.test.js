@@ -4,6 +4,7 @@ import { formatCurrency } from '../src/lib/format.js'
 
 test('formats integer minor units as rupee amounts', () => {
   assert.equal(formatCurrency(49900), '₹499')
+  assert.equal(formatCurrency(49950), '₹499.5')
   assert.equal(formatCurrency(0), '₹0')
 })
 

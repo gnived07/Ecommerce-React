@@ -1,22 +1,23 @@
-import { useEffect } from 'react'
+import { lazy, useEffect } from 'react'
 import { Route, Routes, useLocation } from 'react-router-dom'
 import SiteLayout from './components/SiteLayout.jsx'
-import HomePage from './pages/HomePage.jsx'
-import CatalogPage from './pages/CatalogPage.jsx'
-import ProductPage from './pages/ProductPage.jsx'
 import Button from './components/ui/Button.jsx'
 import { Link } from 'react-router-dom'
 import { CartProvider } from './context/CartContext.jsx'
-import LoginPage from './pages/LoginPage.jsx'
-import CheckoutPage from './pages/CheckoutPage.jsx'
-import OrderConfirmationPage from './pages/OrderConfirmationPage.jsx'
-import AccountPage from './pages/AccountPage.jsx'
-import OrderDetailPage from './pages/OrderDetailPage.jsx'
-import AdminPage from './pages/AdminPage.jsx'
+
+const HomePage = lazy(() => import('./pages/HomePage.jsx'))
+const CatalogPage = lazy(() => import('./pages/CatalogPage.jsx'))
+const ProductPage = lazy(() => import('./pages/ProductPage.jsx'))
+const LoginPage = lazy(() => import('./pages/LoginPage.jsx'))
+const CheckoutPage = lazy(() => import('./pages/CheckoutPage.jsx'))
+const OrderConfirmationPage = lazy(() => import('./pages/OrderConfirmationPage.jsx'))
+const AccountPage = lazy(() => import('./pages/AccountPage.jsx'))
+const OrderDetailPage = lazy(() => import('./pages/OrderDetailPage.jsx'))
+const AdminPage = lazy(() => import('./pages/AdminPage.jsx'))
 
 function ScrollToTop() {
   const { pathname } = useLocation()
-  useEffect(() => window.scrollTo({ top: 0, behavior: 'instant' }), [pathname])
+  useEffect(() => window.scrollTo({ top: 0, behavior: 'auto' }), [pathname])
   return null
 }
 
