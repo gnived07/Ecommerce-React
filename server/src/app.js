@@ -8,6 +8,7 @@ import { errorHandler, notFoundHandler } from './middleware/errors.js'
 import { authRouter } from './routes/auth.js'
 import { catalogRouter } from './routes/catalog.js'
 import { cartRouter } from './routes/cart.js'
+import { orderRouter } from './routes/orders.js'
 
 export const app = express()
 
@@ -32,6 +33,7 @@ app.use(rateLimit({ windowMs: 60_000, limit: 120, standardHeaders: 'draft-8', le
 app.use('/api/auth', authRouter)
 app.use('/api', catalogRouter)
 app.use('/api/cart', cartRouter)
+app.use('/api/orders', orderRouter)
 
 app.get('/api/health', async (_request, response) => {
   try {

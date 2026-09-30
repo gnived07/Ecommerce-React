@@ -8,6 +8,8 @@ import Button from './components/ui/Button.jsx'
 import { Link } from 'react-router-dom'
 import { CartProvider } from './context/CartContext.jsx'
 import LoginPage from './pages/LoginPage.jsx'
+import CheckoutPage from './pages/CheckoutPage.jsx'
+import OrderConfirmationPage from './pages/OrderConfirmationPage.jsx'
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -30,7 +32,8 @@ export default function App() {
           <Route path="products/:slug" element={<ProductPage />} />
           <Route path="login" element={<LoginPage />} />
           <Route path="register" element={<LoginPage mode="register" />} />
-          <Route path="checkout" element={<ComingSoonPage title="A thoughtful checkout." message="Checkout and order placement are being connected. Your bag will remain saved while we finish this step." />} />
+          <Route path="checkout" element={<CheckoutPage />} />
+          <Route path="order-confirmation/:orderNumber" element={<OrderConfirmationPage />} />
           <Route path="account" element={<ComingSoonPage title="Your FitCheck account." message="Order history and account details are coming soon." />} />
           <Route path="*" element={<ComingSoonPage title="That page has moved." message="Let's find your way back to the collection." />} />
         </Route>
