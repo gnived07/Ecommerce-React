@@ -7,7 +7,7 @@ const links = [
   ['New arrivals', '/shop?sort=newest'],
   ['Women', '/shop?category=women'],
   ['Men', '/shop?category=men'],
-  ['Collections', '/shop?category=collections'],
+  ['Collections', '/shop?category=objects'],
 ]
 
 export default function SiteHeader() {

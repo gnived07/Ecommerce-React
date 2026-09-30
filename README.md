@@ -61,7 +61,11 @@ Requirements: Node.js 20.19+ and PostgreSQL 15+.
 1. Copy `.env.example` to `.env` and set the database URL and demo admin credentials. Production must also set the exact frontend origin and serve the API over HTTPS for cross-site session cookies.
 2. Install dependencies with `npm install`.
 3. Start the API and storefront with `npm run dev`.
-4. Apply migrations and seed data with the Prisma commands documented as database phases are added.
+4. Generate Prisma Client and apply the checked-in PostgreSQL migration:
+   - `npm run db:generate --workspace server`
+   - `npm run db:deploy --workspace server`
+5. Seed the catalog and admin using the credentials in `.env`:
+   - `npm run db:seed --workspace server`
 
 The API health endpoint is `http://localhost:4000/api/health`; Vite runs at `http://localhost:5173`.
 
@@ -71,7 +75,7 @@ The catalog uses database-level pagination for newest/name order and a parameter
 
 ## Deployment
 
-The Vite client can deploy to Vercel, the Express server to Render or Railway, and PostgreSQL to Neon or Supabase. Configure the client URL, API URL, database URL, and session secret in the deployment environment; production cookies must use HTTPS and the frontend origin must be explicitly allowed by CORS.
+The Vite client can deploy to Vercel, the Express server to Render or Railway, and PostgreSQL to Neon or Supabase. `vercel.json` provides the client build/SPA rewrite. `render.yaml` builds Prisma Client, applies migrations at service start, and health-checks the API. Set `VITE_API_URL` to the deployed API base ending in `/api`; set `DATABASE_URL` and the exact `CLIENT_URL` on the API. Production cookies require HTTPS and the frontend origin must be explicitly allowed by CORS. To seed a deployed catalog, set `SEED_ADMIN_EMAIL` and `SEED_ADMIN_PASSWORD` in the API environment and run the server workspace's `db:seed` command once.
 
 ## Development phases
 

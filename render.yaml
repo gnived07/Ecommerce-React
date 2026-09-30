@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: fitcheck-api
+    runtime: node
+    buildCommand: npm install --include=dev && npm run db:generate --workspace server
+    startCommand: npm run db:deploy --workspace server && npm run start --workspace server
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: CLIENT_URL
+        sync: false
+      - key: SESSION_TTL_DAYS
+        value: "7"

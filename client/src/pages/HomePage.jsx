@@ -52,7 +52,7 @@ export default function HomePage() {
           {(categories.length ? categories.slice(0, 3) : [
             { name: 'Women', slug: 'women', imageUrl: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=900&q=80' },
             { name: 'Men', slug: 'men', imageUrl: 'https://images.unsplash.com/photo-1516826957135-700dedea698c?auto=format&fit=crop&w=900&q=80' },
-            { name: 'Objects & layers', slug: 'collections', imageUrl: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=900&q=80' },
+            { name: 'Objects & layers', slug: 'objects', imageUrl: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=900&q=80' },
           ]).map((category, index) => (
             <Link className={`category-card category-card--${index + 1}`} to={`/shop?category=${category.slug}`} key={category.slug}>
               <img src={category.imageUrl} alt="" loading="lazy" />
