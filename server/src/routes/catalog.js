@@ -13,6 +13,7 @@ const listSchema = z.object({
   minPriceCents: z.coerce.number().int().min(0).optional(),
   maxPriceCents: z.coerce.number().int().min(0).optional(),
   inStock: z.enum(['true', 'false']).optional(),
+  featured: z.enum(['true', 'false']).optional(),
   sort: z.enum(['newest', 'price-asc', 'price-desc', 'name']).default('newest'),
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(48).default(12),
@@ -62,7 +63,7 @@ catalogRouter.get('/categories', async (_request, response) => {
 })
 
 catalogRouter.get('/products', validate(listSchema, 'query'), async (request, response) => {
-  const { q, category, size, minPriceCents, maxPriceCents, inStock, sort, page, limit } = request.validatedQuery
+  const { q, category, size, minPriceCents, maxPriceCents, inStock, featured, sort, page, limit } = request.validatedQuery
   const variantFilter = {
     active: true,
     ...(size ? { size: { equals: size, mode: 'insensitive' } } : {}),
@@ -73,6 +74,7 @@ catalogRouter.get('/products', validate(listSchema, 'query'), async (request, re
   }
   const where = {
     published: true,
+    ...(featured === 'true' ? { featured: true } : {}),
     ...(category ? { category: { slug: category } } : {}),
     ...(q ? { OR: [
       { name: { contains: q, mode: 'insensitive' } },

@@ -16,6 +16,8 @@ PostgreSQL
 
 The app is organized as an npm workspace: `client/` contains the browser application and `server/` contains the REST API. The API owns prices, inventory, authorization, cart totals, and order creation. PostgreSQL is the source of truth for accounts, catalog, carts, inventory, and orders.
 
+Customer-facing prices are stored as integer minor units and formatted as Indian rupees in the storefront.
+
 ## Planned capabilities
 
 - Editorial home, searchable/filterable catalog, product detail, and responsive shopping bag.
