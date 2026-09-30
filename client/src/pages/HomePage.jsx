@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { ArrowRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { getCategories, getProducts } from '../api/client.js'
-import ProductCard from '../components/catalog/ProductCard.jsx'
+import AnimatedProductGrid from '../components/catalog/AnimatedProductGrid.jsx'
 import ProductGridSkeleton from '../components/catalog/ProductGridSkeleton.jsx'
 import Button from '../components/ui/Button.jsx'
 
@@ -65,7 +65,7 @@ export default function HomePage() {
       <section className="featured-section">
         <div className="page-width">
           <div className="section-heading"><div><p className="eyebrow">Selected for the season</p><h2 className="section-title">Pieces in good company.</h2></div><Link className="text-link" to="/shop?featured=true">Shop the edit <ArrowRight size={14} /></Link></div>
-          {loading ? <ProductGridSkeleton count={4} /> : error ? <p className="body-copy" role="alert">{error}</p> : products.length ? <div className="product-grid">{products.map((product) => <ProductCard key={product.id} product={product} />)}</div> : <p className="body-copy">New pieces are on their way. In the meantime, browse the full collection.</p>}
+          {loading ? <ProductGridSkeleton count={4} /> : error ? <p className="body-copy" role="alert">{error}</p> : products.length ? <AnimatedProductGrid products={products} /> : <p className="body-copy">New pieces are on their way. In the meantime, browse the full collection.</p>}
         </div>
       </section>
 

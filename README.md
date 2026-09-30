@@ -25,6 +25,7 @@ Customer-facing prices are stored as integer minor units and formatted as Indian
 - Database-backed cart and transactional checkout with stock validation and inventory updates.
 - Account order history and protected administration for catalog and order management.
 - Input validation, secure headers, rate limits, accessible states, and reduced-motion support.
+- Subtle route, drawer, and staggered product-grid motion that follows the operating system's reduced-motion preference.
 
 ## Data model plan
 

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { getCategories, getProducts } from '../api/client.js'
-import ProductCard from '../components/catalog/ProductCard.jsx'
+import AnimatedProductGrid from '../components/catalog/AnimatedProductGrid.jsx'
 import ProductGridSkeleton from '../components/catalog/ProductGridSkeleton.jsx'
 import EmptyState from '../components/ui/EmptyState.jsx'
 
@@ -61,7 +61,7 @@ export default function CatalogPage() {
         <label>Sort<select value={params.get('sort') ?? 'newest'} onChange={(event) => update('sort', event.target.value)}><option value="newest">Newest</option><option value="price-asc">Price: low to high</option><option value="price-desc">Price: high to low</option><option value="name">Name</option></select></label>
       </div></div>
       <div className="catalog-price-filter"><span className="eyebrow">Price range</span><label><span className="sr-only">Minimum price in rupees</span><input type="number" min="0" placeholder="From ₹" value={params.has('minPriceCents') ? Number(params.get('minPriceCents')) / 100 : ''} onChange={(event) => update('minPriceCents', event.target.value ? String(Math.round(Number(event.target.value) * 100)) : '')} /></label><span>—</span><label><span className="sr-only">Maximum price in rupees</span><input type="number" min="0" placeholder="To ₹" value={params.has('maxPriceCents') ? Number(params.get('maxPriceCents')) / 100 : ''} onChange={(event) => update('maxPriceCents', event.target.value ? String(Math.round(Number(event.target.value) * 100)) : '')} /></label></div>
-      {loading ? <ProductGridSkeleton /> : error ? <p className="catalog-error" role="alert">{error}</p> : result.products.length ? <div className="product-grid">{result.products.map((product) => <ProductCard key={product.id} product={product} />)}</div> : <EmptyState eyebrow="A quieter search" title="No pieces found." message="Try another term or clear a filter to see more of the collection." actionLabel="Clear filters" actionHref="/shop" />}
+      {loading ? <ProductGridSkeleton /> : error ? <p className="catalog-error" role="alert">{error}</p> : result.products.length ? <AnimatedProductGrid products={result.products} /> : <EmptyState eyebrow="A quieter search" title="No pieces found." message="Try another term or clear a filter to see more of the collection." actionLabel="Clear filters" actionHref="/shop" />}
       {result.pagination?.pages > 1 && <nav className="pagination" aria-label="Catalog pages"><button disabled={result.pagination.page <= 1} onClick={() => update('page', String(result.pagination.page - 1))}>Previous</button><span>Page {result.pagination.page} of {result.pagination.pages}</span><button disabled={result.pagination.page >= result.pagination.pages} onClick={() => update('page', String(result.pagination.page + 1))}>Next</button></nav>}
     </div>
   )

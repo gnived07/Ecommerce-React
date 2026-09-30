@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { getProduct, getProducts } from '../api/client.js'
 import { formatCurrency } from '../lib/format.js'
-import ProductCard from '../components/catalog/ProductCard.jsx'
+import AnimatedProductGrid from '../components/catalog/AnimatedProductGrid.jsx'
 import ProductGridSkeleton from '../components/catalog/ProductGridSkeleton.jsx'
 import Button from '../components/ui/Button.jsx'
 import { useCart } from '../context/CartContext.jsx'
@@ -113,7 +113,7 @@ export default function ProductPage() {
         </section>
       </div>
 
-      {related.length > 0 && <section className="related-section page-width"><div className="section-heading"><div><p className="eyebrow">In good company</p><h2 className="section-title">You may also like.</h2></div></div><div className="product-grid">{related.map((item) => <ProductCard key={item.id} product={item} />)}</div></section>}
+      {related.length > 0 && <section className="related-section page-width"><div className="section-heading"><div><p className="eyebrow">In good company</p><h2 className="section-title">You may also like.</h2></div></div><AnimatedProductGrid products={related} /></section>}
     </>
   )
 }
