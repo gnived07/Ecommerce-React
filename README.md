@@ -45,6 +45,8 @@ Exact request and response shapes will be documented alongside their implementat
 
 Cart routes require an authenticated session. Each cart line points to a product variant; the API derives item prices and subtotals from current database values and checks stock before changing quantities. The browser cart is a view of that persisted record, never the source of pricing or inventory data. Checkout currently supports cash on delivery: a serializable PostgreSQL transaction rechecks stock, decrements inventory, writes order and price snapshots, and clears the cart as one unit. Shipping is ₹300 below ₹5,000 and complimentary above it; tax is included in listed prices.
 
+Admin routes are guarded by both the session and the `ADMIN` role. Staff can create/edit/hide products, change variant price and inventory, and advance order status through valid transitions. Cancelling a pending or processing order restores its reserved units in the same transaction. Product hiding is a reversible publish-state update so historical order snapshots remain intact.
+
 ## Authentication model
 
 Passwords are hashed with bcryptjs (cost 12). A successful registration or login creates a cryptographically random opaque session token in an HttpOnly, SameSite=Lax cookie. Only its SHA-256 hash and expiry are stored in PostgreSQL. `authenticate` resolves that record on protected requests; `requireRole('ADMIN')` enforces staff access on the server. Logout deletes the active session and clears the cookie. Production cookies are Secure and CORS accepts only the configured client origin.

@@ -9,6 +9,7 @@ import { authRouter } from './routes/auth.js'
 import { catalogRouter } from './routes/catalog.js'
 import { cartRouter } from './routes/cart.js'
 import { orderRouter } from './routes/orders.js'
+import { adminRouter } from './routes/admin.js'
 
 export const app = express()
 
@@ -34,6 +35,7 @@ app.use('/api/auth', authRouter)
 app.use('/api', catalogRouter)
 app.use('/api/cart', cartRouter)
 app.use('/api/orders', orderRouter)
+app.use('/api/admin', adminRouter)
 
 app.get('/api/health', async (_request, response) => {
   try {

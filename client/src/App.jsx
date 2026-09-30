@@ -12,6 +12,7 @@ import CheckoutPage from './pages/CheckoutPage.jsx'
 import OrderConfirmationPage from './pages/OrderConfirmationPage.jsx'
 import AccountPage from './pages/AccountPage.jsx'
 import OrderDetailPage from './pages/OrderDetailPage.jsx'
+import AdminPage from './pages/AdminPage.jsx'
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -38,6 +39,7 @@ export default function App() {
           <Route path="order-confirmation/:orderNumber" element={<OrderConfirmationPage />} />
           <Route path="account" element={<AccountPage />} />
           <Route path="account/orders/:orderNumber" element={<OrderDetailPage />} />
+          <Route path="admin" element={<AdminPage />} />
           <Route path="*" element={<ComingSoonPage title="That page has moved." message="Let's find your way back to the collection." />} />
         </Route>
       </Routes>
