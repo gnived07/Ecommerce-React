@@ -27,7 +27,7 @@ export default function SiteHeader() {
           <Link className="brand" to="/" aria-label="FitCheck home">FitCheck<span>®</span></Link>
           <div className="site-header__actions">
             <Link className="icon-button" to="/shop?focus=search" aria-label="Search"><Search size={18} strokeWidth={1.4} /></Link>
-            <Link className="icon-button site-header__account" to="/login" aria-label="Account"><UserRound size={18} strokeWidth={1.4} /></Link>
+            <Link className="icon-button site-header__account" to="/account" aria-label="Account"><UserRound size={18} strokeWidth={1.4} /></Link>
             <button className="icon-button bag-link" type="button" onClick={() => setDrawerOpen(true)} aria-label={`Shopping bag, ${cart?.itemCount ?? 0} items`}><ShoppingBag size={18} strokeWidth={1.4} />{cart?.itemCount > 0 && <span className="bag-link__count">{cart.itemCount}</span>}</button>
           </div>
         </div>

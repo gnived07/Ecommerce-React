@@ -9,6 +9,19 @@ import { validate } from '../middleware/validate.js'
 export const orderRouter = Router()
 orderRouter.use(authenticate)
 
+orderRouter.get('/', async (request, response) => {
+  const orders = await prisma.order.findMany({
+    where: { userId: request.user.id },
+    orderBy: { createdAt: 'desc' },
+    select: {
+      id: true, orderNumber: true, status: true, paymentMethod: true,
+      subtotalCents: true, shippingCents: true, totalCents: true, createdAt: true,
+      _count: { select: { items: true } },
+    },
+  })
+  response.json({ orders: orders.map(({ _count, ...order }) => ({ ...order, lineCount: _count.items })) })
+})
+
 orderRouter.get('/:orderNumber', async (request, response) => {
   const order = await prisma.order.findFirst({
     where: { orderNumber: request.params.orderNumber, userId: request.user.id },

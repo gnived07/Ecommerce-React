@@ -38,7 +38,7 @@ Customer-facing prices are stored as integer minor units and formatted as Indian
 | Auth | `POST /api/auth/register`, `POST /api/auth/login`, `POST /api/auth/logout`, `GET /api/auth/me` |
 | Catalog | `GET /api/products`, `GET /api/products/:slug`, `GET /api/categories` |
 | Cart | `GET /api/cart`, `POST /api/cart/items`, `PATCH /api/cart/items/:id`, `DELETE /api/cart/items/:id`, `DELETE /api/cart` |
-| Checkout & account | `POST /api/orders`, `GET /api/orders`, `GET /api/orders/:id` |
+| Checkout & account | `POST /api/orders`, `GET /api/orders`, `GET /api/orders/:orderNumber` |
 | Admin | Protected product/variant CRUD and order status routes under `/api/admin` |
 
 Exact request and response shapes will be documented alongside their implementation.

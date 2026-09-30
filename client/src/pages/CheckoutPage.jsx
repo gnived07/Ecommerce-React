@@ -39,7 +39,7 @@ export default function CheckoutPage() {
   }
 
   if (loading) return <div className="notice-page page-width" aria-busy="true"><p className="eyebrow">FitCheck · Checkout</p><h1 className="display-title">Preparing your bag.</h1></div>
-  if (!cart) return <section className="notice-page page-width"><p className="eyebrow">FitCheck · Checkout</p><h1 className="display-title">Your bag is saved to your account.</h1><p className="body-copy">Sign in to review your pieces and continue to checkout.</p><Button as={Link} to="/login">Sign in</Button></section>
+  if (!cart) return <section className="notice-page page-width"><p className="eyebrow">FitCheck · Checkout</p><h1 className="display-title">Your bag is saved to your account.</h1><p className="body-copy">Sign in to review your pieces and continue to checkout.</p><Button as={Link} to="/login" state={{ from: '/checkout' }}>Sign in</Button></section>
   if (!cart.items.length) return <section className="notice-page page-width"><p className="eyebrow">FitCheck · Checkout</p><h1 className="display-title">Your bag is empty.</h1><p className="body-copy">Find a piece that feels like you, then come back to finish your order.</p><Button as={Link} to="/shop">Explore the collection</Button></section>
 
   return (

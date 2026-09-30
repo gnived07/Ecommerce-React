@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { request } from '../api/client.js'
 import { useCart } from '../context/CartContext.jsx'
 import Button from '../components/ui/Button.jsx'
@@ -7,6 +7,7 @@ import Button from '../components/ui/Button.jsx'
 export default function LoginPage({ mode = 'login' }) {
   const registering = mode === 'register'
   const navigate = useNavigate()
+  const location = useLocation()
   const { refresh } = useCart()
   const [values, setValues] = useState({ firstName: '', lastName: '', email: '', password: '' })
   const [busy, setBusy] = useState(false)
@@ -21,7 +22,8 @@ export default function LoginPage({ mode = 'login' }) {
         method: 'POST', body: JSON.stringify(values),
       })
       await refresh()
-      navigate('/shop', { replace: true })
+      const from = location.state?.from
+      navigate(typeof from === 'string' && from.startsWith('/') && !from.startsWith('//') ? from : '/shop', { replace: true })
     } catch (requestError) {
       setError(requestError.message || 'We could not sign you in. Please try again.')
     } finally {
