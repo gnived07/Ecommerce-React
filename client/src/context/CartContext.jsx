@@ -29,7 +29,9 @@ export function CartProvider({ children }) {
     }
   }, [])
 
-  useEffect(() => { refresh().catch(() => {}) }, [refresh])
+  useEffect(() => {
+    refresh().catch(() => {})
+  }, [refresh])
 
   const mutate = useCallback(async (path, options = {}) => {
     setBusy(true)

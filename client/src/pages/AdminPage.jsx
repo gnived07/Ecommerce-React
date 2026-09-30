@@ -38,6 +38,7 @@ export default function AdminPage() {
   const [notice, setNotice] = useState('')
   const [error, setError] = useState('')
   const [variantDrafts, setVariantDrafts] = useState({})
+  const [newVariantDrafts, setNewVariantDrafts] = useState({})
 
   async function load() {
     setLoading(true)
@@ -89,7 +90,11 @@ export default function AdminPage() {
     setBusy(true)
     setError('')
     setNotice('')
-    const images = form.imageUrl ? [{ url: form.imageUrl, alt: form.imageAlt || form.name }] : []
+    const images = form.imageUrl
+      ? editing && form.imageUrl === editing.images[0]?.url
+        ? editing.images.map(({ url, alt }) => ({ url, alt }))
+        : [{ url: form.imageUrl, alt: form.imageAlt || form.name }]
+      : []
     try {
       if (editing) {
         const data = {
@@ -145,6 +150,25 @@ export default function AdminPage() {
     } catch (requestError) { setError(requestError.message) }
   }
 
+  async function addVariant(product, event) {
+    event.preventDefault()
+    const draft = newVariantDrafts[product.id] ?? {}
+    setError('')
+    try {
+      const sku = `${product.slug}-${draft.size}-${draft.color}`.replace(/[^a-zA-Z0-9-]/g, '-').toUpperCase().slice(0, 80)
+      const { variant } = await request(`/admin/products/${product.id}/variants`, {
+        method: 'POST', body: JSON.stringify({
+          sku, size: draft.size, color: draft.color,
+          priceCents: Math.round(Number(draft.priceRupees) * 100), stock: Number(draft.stock),
+        }),
+      })
+      setProducts((current) => current.map((item) => item.id === product.id ? { ...item, variants: [...item.variants, variant] } : item))
+      setVariantDrafts((current) => ({ ...current, [variant.id]: { stock: String(variant.stock), priceRupees: String(variant.priceCents / 100), active: variant.active } }))
+      setNewVariantDrafts((current) => ({ ...current, [product.id]: { size: '', color: '', priceRupees: '', stock: '5' } }))
+      setNotice(`New ${variant.size} / ${variant.color} option added to ${product.name}.`)
+    } catch (requestError) { setError(requestError.message) }
+  }
+
   async function updateOrder(order, status) {
     setError('')
     try {
@@ -174,7 +198,7 @@ export default function AdminPage() {
         <label className="field"><span className="field__label">Details</span><textarea className="field__control" name="details" maxLength={5000} value={form.details ?? ''} onChange={updateForm} /></label>
         <label className="field"><span className="field__label">Care</span><input className="field__control" name="care" maxLength={500} value={form.care ?? ''} onChange={updateForm} /></label>
       </div><div className="admin-checks"><label><input type="checkbox" name="featured" checked={form.featured} onChange={updateForm} /> Featured</label><label><input type="checkbox" name="published" checked={form.published} onChange={updateForm} /> Visible in storefront</label></div><div className="admin-product-form__actions"><Button type="submit" disabled={busy}>{busy ? 'Saving…' : editing ? 'Save changes' : 'Create product'}</Button><Button variant="outline" type="button" onClick={() => setFormOpen(false)}>Cancel</Button></div></form>}
-      <div className="admin-product-list">{products.map((product) => <article className="admin-product" key={product.id}><div className="admin-product__overview"><div className="admin-product__image">{product.images[0] && <img src={product.images[0].url} alt="" />}</div><div><h3>{product.name}</h3><p>{product.category.name} · <span className={product.published ? 'published-label' : ''}>{product.published ? 'Published' : 'Hidden'}</span></p><Link to={`/products/${product.slug}`} target="_blank" rel="noreferrer">View storefront page ↗</Link></div><div className="admin-product__actions"><button type="button" onClick={() => openEdit(product)}>Edit</button><button type="button" onClick={() => togglePublished(product)}>{product.published ? 'Hide' : 'Publish'}</button></div></div><div className="admin-variants">{product.variants.map((variant) => <div className="admin-variant" key={variant.id}><span>{variant.size} · {variant.color}</span><label>Price ₹<input type="number" min="1" value={variantDrafts[variant.id]?.priceRupees ?? ''} onChange={(event) => setVariantDrafts((current) => ({ ...current, [variant.id]: { ...current[variant.id], priceRupees: event.target.value } }))} /></label><label>Stock<input type="number" min="0" max="100000" value={variantDrafts[variant.id]?.stock ?? ''} onChange={(event) => setVariantDrafts((current) => ({ ...current, [variant.id]: { ...current[variant.id], stock: event.target.value } }))} /></label><label className="admin-variant__active"><input type="checkbox" checked={variantDrafts[variant.id]?.active ?? false} onChange={(event) => setVariantDrafts((current) => ({ ...current, [variant.id]: { ...current[variant.id], active: event.target.checked } }))} /> Active</label><Button variant="outline" onClick={() => saveVariant(variant)}>Save</Button></div>)}</div></article>)}</div>
+      <div className="admin-product-list">{products.map((product) => <article className="admin-product" key={product.id}><div className="admin-product__overview"><div className="admin-product__image">{product.images[0] && <img src={product.images[0].url} alt="" />}</div><div><h3>{product.name}</h3><p>{product.category.name} · <span className={product.published ? 'published-label' : ''}>{product.published ? 'Published' : 'Hidden'}</span></p><Link to={`/products/${product.slug}`} target="_blank" rel="noreferrer">View storefront page ↗</Link></div><div className="admin-product__actions"><button type="button" onClick={() => openEdit(product)}>Edit</button><button type="button" onClick={() => togglePublished(product)}>{product.published ? 'Hide' : 'Publish'}</button></div></div><div className="admin-variants">{product.variants.map((variant) => <div className="admin-variant" key={variant.id}><span>{variant.size} · {variant.color}</span><label>Price ₹<input type="number" min="1" value={variantDrafts[variant.id]?.priceRupees ?? ''} onChange={(event) => setVariantDrafts((current) => ({ ...current, [variant.id]: { ...current[variant.id], priceRupees: event.target.value } }))} /></label><label>Stock<input type="number" min="0" max="100000" value={variantDrafts[variant.id]?.stock ?? ''} onChange={(event) => setVariantDrafts((current) => ({ ...current, [variant.id]: { ...current[variant.id], stock: event.target.value } }))} /></label><label className="admin-variant__active"><input type="checkbox" checked={variantDrafts[variant.id]?.active ?? false} onChange={(event) => setVariantDrafts((current) => ({ ...current, [variant.id]: { ...current[variant.id], active: event.target.checked } }))} /> Active</label><Button variant="outline" onClick={() => saveVariant(variant)}>Save</Button></div>)}<form className="admin-variant-add" onSubmit={(event) => addVariant(product, event)}><label>Size<input required maxLength={30} value={newVariantDrafts[product.id]?.size ?? ''} onChange={(event) => setNewVariantDrafts((current) => ({ ...current, [product.id]: { size: event.target.value, color: current[product.id]?.color ?? '', priceRupees: current[product.id]?.priceRupees ?? '', stock: current[product.id]?.stock ?? '5' } }))} /></label><label>Colour<input required maxLength={50} value={newVariantDrafts[product.id]?.color ?? ''} onChange={(event) => setNewVariantDrafts((current) => ({ ...current, [product.id]: { size: current[product.id]?.size ?? '', color: event.target.value, priceRupees: current[product.id]?.priceRupees ?? '', stock: current[product.id]?.stock ?? '5' } }))} /></label><label>Price ₹<input required type="number" min="1" value={newVariantDrafts[product.id]?.priceRupees ?? ''} onChange={(event) => setNewVariantDrafts((current) => ({ ...current, [product.id]: { size: current[product.id]?.size ?? '', color: current[product.id]?.color ?? '', priceRupees: event.target.value, stock: current[product.id]?.stock ?? '5' } }))} /></label><label>Stock<input required type="number" min="0" max="100000" value={newVariantDrafts[product.id]?.stock ?? '5'} onChange={(event) => setNewVariantDrafts((current) => ({ ...current, [product.id]: { size: current[product.id]?.size ?? '', color: current[product.id]?.color ?? '', priceRupees: current[product.id]?.priceRupees ?? '', stock: event.target.value } }))} /></label><Button type="submit">Add option</Button></form></div></article>)}</div>
     </section> : <section id="admin-orders-panel" className="admin-orders" role="tabpanel" aria-labelledby="admin-orders-tab"><div className="section-heading"><div><p className="eyebrow">Customer activity</p><h2 className="section-title">Orders</h2></div><span className="eyebrow">{orders.length} total</span></div><div className="admin-order-list">{orders.map((order) => <article className="admin-order" key={order.id}><div className="admin-order__top"><div><span className="eyebrow">{order.orderNumber}</span><span className="admin-order__date">{dateLabel(order.createdAt)}</span></div><strong>{formatCurrency(order.totalCents)}</strong></div><div className="admin-order__customer"><strong>{order.shippingName}</strong><span>{order.email}</span><span>{order.items.length} lines · {order.items.reduce((sum, item) => sum + item.quantity, 0)} items</span></div><div className="admin-order__bottom"><span className={`status status--${order.status.toLowerCase()}`}>{titleCase(order.status)}</span><label>Status<select value={order.status} disabled={!nextStatuses[order.status].length} onChange={(event) => updateOrder(order, event.target.value)}><option value={order.status}>{titleCase(order.status)}</option>{nextStatuses[order.status].map((status) => <option key={status} value={status}>{titleCase(status)}</option>)}</select></label></div></article>)}</div></section>}
   </div>
 }

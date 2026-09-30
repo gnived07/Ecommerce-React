@@ -10,9 +10,16 @@ export function notFoundHandler(_request, _response, next) {
   next(new HttpError(404, 'The requested resource was not found', 'NOT_FOUND'))
 }
 
-export function errorHandler(error, _request, response, _next) {
+export function errorHandler(error, _request, response, next) {
+  void next
   if (error?.code === 'P2034') {
     return response.status(409).json({ error: 'This changed at the same time as another request. Please try again.', code: 'CONCURRENT_UPDATE' })
+  }
+  if (error?.code === 'P2002') {
+    return response.status(409).json({ error: 'A record with those details already exists', code: 'RESOURCE_CONFLICT' })
+  }
+  if (error?.code === 'P2003') {
+    return response.status(409).json({ error: 'This change conflicts with related records', code: 'RELATION_CONFLICT' })
   }
   if (error instanceof HttpError) {
     return response.status(error.status).json({ error: error.message, code: error.code })

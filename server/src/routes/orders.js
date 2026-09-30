@@ -75,6 +75,9 @@ orderRouter.post('/', validate(checkoutSchema), async (request, response) => {
     const shippingCents = subtotalCents >= FREE_SHIPPING_THRESHOLD ? 0 : STANDARD_SHIPPING
     const taxCents = 0
     const totalCents = subtotalCents + shippingCents + taxCents
+    if (totalCents > 2_147_483_647) {
+      throw new HttpError(400, 'This order exceeds the supported checkout total', 'ORDER_TOTAL_TOO_LARGE')
+    }
 
     for (const item of cart.items) {
       const changed = await transaction.productVariant.updateMany({

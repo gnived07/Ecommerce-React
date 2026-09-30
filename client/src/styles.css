@@ -347,6 +347,10 @@ img { display: block; max-width: 100%; }
 .admin-variant label:not(.admin-variant__active) { display: flex; align-items: center; gap: 5px; color: var(--muted); }
 .admin-variant input[type="number"] { width: 70px; height: 30px; border: 1px solid var(--line-dark); padding-inline: 6px; background: var(--paper); font-size: 10px; }
 .admin-variant .button { min-height: 30px; margin-left: auto; padding-inline: 12px; font-size: 8px; }
+.admin-variant-add { display: flex; flex-wrap: wrap; align-items: end; gap: 10px; padding-block: 13px 5px; }
+.admin-variant-add label { display: flex; align-items: center; gap: 5px; color: var(--muted); font-size: 9px; }
+.admin-variant-add input { width: 88px; height: 32px; border: 1px solid var(--line-dark); padding-inline: 6px; background: var(--paper); font-size: 10px; }
+.admin-variant-add .button { min-height: 32px; padding-inline: 12px; font-size: 8px; }
 .admin-order-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .admin-order { display: flex; flex-direction: column; gap: 15px; padding: 18px; border: 1px solid var(--line); background: #fbf9f4; }
 .admin-order__top, .admin-order__top > div { display: flex; align-items: center; justify-content: space-between; gap: 10px; }

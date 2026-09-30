@@ -72,6 +72,21 @@ adminRouter.post('/products', validate(createProductSchema), async (request, res
   response.status(201).json({ product })
 })
 
+adminRouter.post('/products/:id/variants', validate(variantSchema), async (request, response) => {
+  const product = await prisma.product.findUnique({ where: { id: request.params.id }, select: { id: true } })
+  if (!product) throw new HttpError(404, 'Product not found', 'PRODUCT_NOT_FOUND')
+  try {
+    const variant = await prisma.productVariant.create({
+      data: { ...request.body, productId: product.id },
+      include: { product: { select: { id: true, name: true, slug: true } } },
+    })
+    response.status(201).json({ variant })
+  } catch (error) {
+    if (error?.code === 'P2002') throw new HttpError(409, 'That SKU or size/colour option already exists', 'VARIANT_CONFLICT')
+    throw error
+  }
+})
+
 adminRouter.patch('/products/:id', validate(updateProductSchema), async (request, response) => {
   const { images, ...data } = request.body
   try {

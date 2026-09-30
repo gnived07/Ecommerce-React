@@ -13,4 +13,9 @@ export default [
       parserOptions: { ecmaFeatures: { jsx: true } },
     },
   },
+  {
+    files: ['**/*.jsx'],
+    // JSX references are not understood by eslint:recommended without a React JSX plugin.
+    rules: { 'no-unused-vars': 'off' },
+  },
 ]
