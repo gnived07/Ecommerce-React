@@ -15,7 +15,11 @@ export function errorHandler(error, _request, response, _next) {
     return response.status(error.status).json({ error: error.message, code: error.code })
   }
   if (error?.name === 'ZodError') {
-    return response.status(400).json({ error: 'Please check the submitted information', code: 'VALIDATION_ERROR' })
+    return response.status(400).json({
+      error: 'Please check the submitted information',
+      code: 'VALIDATION_ERROR',
+      details: error.issues.map(({ path, message }) => ({ path: path.join('.'), message })),
+    })
   }
   console.error(error)
   return response.status(500).json({ error: 'Something went wrong', code: 'INTERNAL_ERROR' })

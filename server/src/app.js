@@ -1,9 +1,11 @@
 import express from 'express'
 import helmet from 'helmet'
 import cors from 'cors'
+import cookieParser from 'cookie-parser'
 import rateLimit from 'express-rate-limit'
 import { prisma } from './lib/prisma.js'
 import { errorHandler, notFoundHandler } from './middleware/errors.js'
+import { authRouter } from './routes/auth.js'
 
 export const app = express()
 
@@ -22,7 +24,10 @@ app.use(cors({
   credentials: true,
 }))
 app.use(express.json({ limit: '32kb' }))
+app.use(cookieParser())
 app.use(rateLimit({ windowMs: 60_000, limit: 120, standardHeaders: 'draft-8', legacyHeaders: false }))
+
+app.use('/api/auth', authRouter)
 
 app.get('/api/health', async (_request, response) => {
   try {

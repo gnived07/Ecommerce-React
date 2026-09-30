@@ -41,6 +41,10 @@ The app is organized as an npm workspace: `client/` contains the browser applica
 
 Exact request and response shapes will be documented alongside their implementation.
 
+## Authentication model
+
+Passwords are hashed with bcryptjs (cost 12). A successful registration or login creates a cryptographically random opaque session token in an HttpOnly, SameSite=Lax cookie. Only its SHA-256 hash and expiry are stored in PostgreSQL. `authenticate` resolves that record on protected requests; `requireRole('ADMIN')` enforces staff access on the server. Logout deletes the active session and clears the cookie. Production cookies are Secure and CORS accepts only the configured client origin.
+
 ## Local setup
 
 Requirements: Node.js 20.19+ and PostgreSQL 15+.
