@@ -6,6 +6,7 @@ import rateLimit from 'express-rate-limit'
 import { prisma } from './lib/prisma.js'
 import { errorHandler, notFoundHandler } from './middleware/errors.js'
 import { authRouter } from './routes/auth.js'
+import { catalogRouter } from './routes/catalog.js'
 
 export const app = express()
 
@@ -28,6 +29,7 @@ app.use(cookieParser())
 app.use(rateLimit({ windowMs: 60_000, limit: 120, standardHeaders: 'draft-8', legacyHeaders: false }))
 
 app.use('/api/auth', authRouter)
+app.use('/api', catalogRouter)
 
 app.get('/api/health', async (_request, response) => {
   try {
