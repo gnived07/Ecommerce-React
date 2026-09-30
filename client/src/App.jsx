@@ -3,6 +3,7 @@ import { Route, Routes, useLocation } from 'react-router-dom'
 import SiteLayout from './components/SiteLayout.jsx'
 import HomePage from './pages/HomePage.jsx'
 import CatalogPage from './pages/CatalogPage.jsx'
+import ProductPage from './pages/ProductPage.jsx'
 import Button from './components/ui/Button.jsx'
 import { Link } from 'react-router-dom'
 
@@ -24,7 +25,7 @@ export default function App() {
         <Route element={<SiteLayout />}>
           <Route index element={<HomePage />} />
           <Route path="shop" element={<CatalogPage />} />
-          <Route path="products/:slug" element={<ComingSoonPage title="Good things, in detail." message="The full product story is coming together. Explore the collection while we finish the details." />} />
+          <Route path="products/:slug" element={<ProductPage />} />
           <Route path="bag" element={<ComingSoonPage title="Your bag is waiting." message="Your shopping bag will live here. Browse the collection to find something worth keeping." />} />
           <Route path="login" element={<ComingSoonPage title="A place for your pieces." message="Account sign-in is coming soon. Your FitCheck account will keep your orders and details together." />} />
           <Route path="account" element={<ComingSoonPage title="Your FitCheck account." message="Order history and account details are coming soon." />} />
