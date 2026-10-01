@@ -2,12 +2,26 @@ import { HttpError } from './errors.js'
 
 const safeMethods = new Set(['GET', 'HEAD', 'OPTIONS'])
 
+export function isAllowedOrigin(origin) {
+  if (!origin) return false
+  if (origin === process.env.CLIENT_URL) return true
+  if (process.env.NODE_ENV !== 'development') return false
+
+  try {
+    const url = new URL(origin)
+    return url.origin === origin
+      && url.protocol === 'http:'
+      && ['localhost', '127.0.0.1', '[::1]'].includes(url.hostname)
+  } catch {
+    return false
+  }
+}
+
 export function verifyRequestOrigin(request, _response, next) {
   if (safeMethods.has(request.method)) return next()
 
   const origin = request.get('origin')
-  const allowedOrigin = process.env.CLIENT_URL ?? (process.env.NODE_ENV === 'development' ? 'http://localhost:5173' : undefined)
-  if (origin && origin === allowedOrigin) return next()
+  if (origin && isAllowedOrigin(origin)) return next()
   if (!origin && process.env.NODE_ENV !== 'production') return next()
   return next(new HttpError(403, 'This request origin is not allowed', 'ORIGIN_NOT_ALLOWED'))
 }

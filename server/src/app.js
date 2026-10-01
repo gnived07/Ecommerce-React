@@ -9,20 +9,16 @@ import { catalogRouter } from './routes/catalog.js'
 import { cartRouter } from './routes/cart.js'
 import { orderRouter } from './routes/orders.js'
 import { adminRouter } from './routes/admin.js'
-import { noStore, parseCookies, verifyRequestOrigin } from './middleware/security.js'
+import { isAllowedOrigin, noStore, parseCookies, verifyRequestOrigin } from './middleware/security.js'
 
 export const app = express()
 
 app.disable('x-powered-by')
 if (process.env.NODE_ENV === 'production') app.set('trust proxy', 1)
 app.use(helmet())
-const allowedOrigins = new Set(
-  [process.env.CLIENT_URL, ...(process.env.NODE_ENV === 'development' ? ['http://localhost:5173'] : [])]
-    .filter(Boolean),
-)
 app.use(cors({
   origin(origin, callback) {
-    if (!origin || allowedOrigins.has(origin)) return callback(null, true)
+    if (!origin || isAllowedOrigin(origin)) return callback(null, true)
     return callback(new HttpError(403, 'This request origin is not allowed', 'ORIGIN_NOT_ALLOWED'))
   },
   credentials: true,

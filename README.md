@@ -66,9 +66,9 @@ Requirements: Node.js 20.19+ and PostgreSQL 15+.
 6. Create categories, products, variants, and the configured admin account: `npm run db:seed --workspace server`.
 7. Start both apps: `npm run dev`.
 
-The storefront runs at `http://localhost:5173`; the API runs at `http://localhost:4000`. Check API/database readiness at `http://localhost:4000/api/health`. Register a customer account through `/register`; use the configured seed credentials for the admin account.
+The storefront runs at `http://localhost:5173`; the API runs at `http://localhost:4000`. Check API/database readiness at `http://localhost:4000/api/health`. Register a customer account through `/register`; use the configured seed credentials for the admin account. During development, the API accepts HTTP origins on `localhost`, `127.0.0.1`, and `[::1]` across local ports, so a Vite fallback port works too.
 
-The dependency versions are constrained in workspace manifests. Generate and commit `package-lock.json` with `npm install` before production releases so transitive packages are locked as well.
+The checked-in `package-lock.json` pins workspace and transitive dependencies; use `npm ci` for repeatable installs.
 
 ### Environment variables
 
