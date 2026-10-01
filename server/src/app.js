@@ -35,17 +35,6 @@ app.use('/api/cart', cartRouter)
 app.use('/api/orders', orderRouter)
 app.use('/api/admin', adminRouter)
 
-app.get('/api/debug-runtime', (_request, response) => {
-  response.json({
-    runtime: 'fitcheck-debug',
-    cwd: process.cwd(),
-    file: import.meta.url,
-    node: process.version,
-    env: process.env.NODE_ENV,
-    port: process.env.PORT,
-  })
-})
-
 app.get('/api/health', async (_request, response) => {
   try {
     await prisma.$queryRaw`SELECT 1`
